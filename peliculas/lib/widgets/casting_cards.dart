@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:peliculas/models/dd/cast.dart';
+import 'package:peliculas/models/cast_models/cast.dart';
 import 'package:peliculas/providers/movie_provider.dart';
 import 'package:provider/provider.dart';
 

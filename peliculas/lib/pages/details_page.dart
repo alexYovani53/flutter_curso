@@ -60,6 +60,7 @@ class _CustomAppBarr extends StatelessWidget {
         ),
         background: FadeInImage(
           placeholder: const AssetImage("assets/loading.gif"),
+          imageErrorBuilder: (context, error, stackTrace) => Image.asset("assets/no-image.jpg", fit: BoxFit.cover,),
           image: NetworkImage(movie.fullBackdropPath),
           fit: BoxFit.cover,
           height: 150,
@@ -83,13 +84,16 @@ class _PosterAndTitle extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: FadeInImage(
-              placeholder: const AssetImage("assets/loading.gif"),
-              image: NetworkImage(movie.fullImage),
-              height: 150,
-              fit: BoxFit.cover,
+          Hero(
+            tag: movie.heroId!,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: FadeInImage(
+                placeholder: const AssetImage("assets/loading.gif"),
+                image: NetworkImage(movie.fullImage),
+                height: 150,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(width: 20),

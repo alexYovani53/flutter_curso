@@ -56,7 +56,7 @@ class _MovieSliderState extends State<MovieSlider> {
               scrollDirection: Axis.horizontal,
               itemCount: widget.populars.length,
               itemBuilder: (context, index) =>
-                  _MoviePoster(movie: widget.populars[index]),
+                  _MoviePoster(movie: widget.populars[index], heroId: "favorite-${widget.populars[index].id}" ),
             ),
           )
         ],
@@ -68,30 +68,34 @@ class _MovieSliderState extends State<MovieSlider> {
 class _MoviePoster extends StatelessWidget {
   const _MoviePoster({
     Key? key,
-    required this.movie,
+    required this.movie, required this.heroId,
   }) : super(key: key);
 
   final Movie movie;
+  final String heroId;
 
   @override
   Widget build(BuildContext context) {
+    movie.heroId = heroId;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       width: 130,
       height: 190,
       child: Column(
         children: [
-          GestureDetector(
-            onTap: () =>
-                Navigator.pushNamed(context, "details", arguments: movie),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: FadeInImage(
-                width: 130,
-                height: 190,
-                fit: BoxFit.cover,
-                placeholder: const AssetImage("assets/no-image.jpg"),
-                image: NetworkImage(movie.fullImage),
+          Hero(
+            tag: heroId,
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(context, "details", arguments: movie),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: FadeInImage(
+                  width: 130,
+                  height: 190,
+                  fit: BoxFit.cover,
+                  placeholder: const AssetImage("assets/no-image.jpg"),
+                  image: NetworkImage(movie.fullImage),
+                ),
               ),
             ),
           ),

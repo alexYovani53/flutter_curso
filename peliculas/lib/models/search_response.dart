@@ -1,20 +1,20 @@
 import 'movie.dart';
 
-class PopularResponse {
+class SearchResponse {
   int? page;
   List<Movie>? results;
   int? totalPages;
   int? totalResults;
 
-  PopularResponse({
+  SearchResponse({
     this.page,
     this.results,
     this.totalPages,
     this.totalResults,
   });
 
-  factory PopularResponse.fromJson(Map<String, dynamic> json) =>
-      PopularResponse(
+  factory SearchResponse.fromJson(Map<String, dynamic> json) =>
+      SearchResponse(
         page: json['page'] as int?,
         results: (json['results'] as List<dynamic>?)
             ?.map((e) => Movie.fromJson(e))

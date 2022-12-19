@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:peliculas/providers/movie_provider.dart';
+import 'package:peliculas/search/search_delegate.dart';
 import 'package:peliculas/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +17,7 @@ class HomePage extends StatelessWidget {
         title: const Text('Películas en cines'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => showSearch(context: context, delegate: MovieSearchDelegate()),
             icon: const Icon(Icons.search_outlined),
           ),
         ],

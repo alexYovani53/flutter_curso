@@ -1,4 +1,5 @@
 import 'package:disenos/pages/basic_desing.dart';
+import 'package:disenos/pages/home_page.dart';
 import 'package:disenos/pages/scroll_page.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,9 @@ class RouterApp{
         
       case ScrollPage.routeName:
         return MaterialPageRoute(builder: (context) => const ScrollPage());
+
+      case HomePage.routeName:
+        return MaterialPageRoute(builder: (context) => const HomePage());
     }
     return null;
   }

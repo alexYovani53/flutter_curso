@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productos_app/pages/pages.dart';
 import 'package:productos_app/provider/login_form_provider.dart';
 import 'package:productos_app/utils/app_decoration_input.dart';
-import 'package:productos_app/widgets/auth_background.dart';
+import 'package:productos_app/widgets/widget_auth_background.dart';
 import 'package:productos_app/widgets/widget_card_container.dart';
 import 'package:provider/provider.dart';
 

@@ -10,7 +10,7 @@ class AppRouter{
       case LoginPage.routeName:
         return MaterialPageRoute(builder: (context) => const LoginPage());
       case ProductPage.routeName:
-        return MaterialPageRoute(builder: (context) => const ProductPage());
+        return MaterialPageRoute(builder: (context) => ProductPage());
     }
     return null;
   }

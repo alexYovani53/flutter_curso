@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProductImage extends StatelessWidget {
-  const ProductImage({super.key});
+  final String? picture;
+  const ProductImage({super.key, this.picture});
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +13,13 @@ class ProductImage extends StatelessWidget {
         width: double.infinity,
         height: 450,
         decoration: _buildDecoration(),
-        child: const FadeInImage(
-          placeholder: AssetImage("assets/jar-loading.gif"),
-          image: NetworkImage("https://via.placeholder.com/400x300/green"),
-          fit: BoxFit.cover,
+        child: Opacity(
+          opacity: 0.8,
+          child: FadeInImage(
+            placeholder: const AssetImage("assets/jar-loading.gif"),
+            image: picture != null ? NetworkImage(picture!) : const AssetImage("assets/no-image.png") as ImageProvider,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

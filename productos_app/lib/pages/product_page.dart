@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:productos_app/models/producto.dart';
+import 'package:productos_app/provider/product_form_provider.dart';
+import 'package:productos_app/services/product_services.dart';
 import 'package:productos_app/utils/app_decoration_input.dart';
 import 'package:productos_app/widgets/index.dart';
+import 'package:provider/provider.dart';
 
 class ProductPage extends StatelessWidget {
-  const ProductPage ({super.key});
+  ProductPage ({super.key});
 
   static const routeName = "product"; 
+  late Producto producto;
+
+  @override
+  Widget build(BuildContext context) {
+    producto = Provider.of<ProductsServices>(context).selectedProduct!;
+    return ChangeNotifierProvider(
+      create: (context) => ProductFormProvider(producto: producto.copy()),
+      child:  _ProductBody(producto: producto),
+    );
+  }
+}
+
+class _ProductBody extends StatelessWidget {
+  const _ProductBody({
+    Key? key,
+    required this.producto,
+  }) : super(key: key);
+
+  final Producto producto;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,8 +40,7 @@ class ProductPage extends StatelessWidget {
           children: [
             Stack(
               children: [
-                const ProductImage(),
-
+                ProductImage(picture: producto.picture),
                 Positioned(
                   top: 60, left: 20,
                   child: IconButton(
@@ -61,6 +85,7 @@ class _ProductForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formProvider = Provider.of<ProductFormProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
@@ -71,18 +96,35 @@ class _ProductForm extends StatelessWidget {
           children: [
             const SizedBox(height: 10),
             TextFormField(
+              initialValue: formProvider.producto.name,
+              onChanged: (value) => formProvider.producto.name = value,
+              validator: (value) {
+                return (value == null || value.isEmpty)
+                  ? 'El nombre es obligatorio'
+                  : null;
+              },
               decoration: AppDecorationInput.authInputDecoration(hintText: 'Nombre del producto', labelText: "Nombre"),
             ),
             const SizedBox(height: 20),
             TextFormField(
               keyboardType: TextInputType.number,
-              decoration: AppDecorationInput.authInputDecoration(hintText: '\$150', labelText: "Precio"),
+              initialValue: formProvider.producto.price.toString(),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
+              ],
+              onChanged: (value) => formProvider.producto.price = double.tryParse(value) ?? 0.0,
+              validator: (value) {
+                return (value == null || value.isEmpty)
+                  ? 'El nombre es obligatorio'
+                  : null;
+              },
+              decoration: AppDecorationInput.authInputDecoration(hintText: 'Precio del articulo', labelText: "Precio"),
             ),
             const SizedBox(height: 20),
             SwitchListTile.adaptive(
               title: const Text('Disponible'),
-              value: true,
-              onChanged: (value) {},
+              value: formProvider.producto.available,
+              onChanged: (value) => formProvider.updateAvailability(value),
             ),
             const SizedBox(height: 20),
           ],

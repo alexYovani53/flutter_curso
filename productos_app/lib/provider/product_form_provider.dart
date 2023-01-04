@@ -17,4 +17,9 @@ class ProductFormProvider extends ChangeNotifier {
     producto.available = value;
     notifyListeners();
   }
+
+  Future updateSelectedProductImage(String path) async {
+    producto.picture = path;
+    notifyListeners();
+  }
 }

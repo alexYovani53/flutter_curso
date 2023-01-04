@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class ProductImage extends StatelessWidget {
@@ -6,6 +8,12 @@ class ProductImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final image = picture != null 
+      ?  picture!.contains("http")
+        ? NetworkImage(picture!)
+        : FileImage(File(picture!))
+      : const AssetImage("assets/no-image.png");
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Container(
@@ -17,7 +25,7 @@ class ProductImage extends StatelessWidget {
           opacity: 0.8,
           child: FadeInImage(
             placeholder: const AssetImage("assets/jar-loading.gif"),
-            image: picture != null ? NetworkImage(picture!) : const AssetImage("assets/no-image.png") as ImageProvider,
+            image: image as ImageProvider,
             fit: BoxFit.cover,
           ),
         ),

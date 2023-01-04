@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:productos_app/models/producto.dart';
 
@@ -154,6 +156,11 @@ class _BackGroundImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final image = producto.picture != null 
+      ?  producto.picture!.contains("http")
+        ? NetworkImage(producto.picture!)
+        : FileImage(File(producto.picture!))
+      : const AssetImage("assets/no-image.png");
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: SizedBox(
@@ -161,7 +168,7 @@ class _BackGroundImage extends StatelessWidget {
         height: 400,
         child: FadeInImage(
           placeholder: const AssetImage("assets/jar-loading.gif"),
-          image: producto.picture != null ? NetworkImage(producto.picture!) : const AssetImage("assets/no-image.png") as ImageProvider,
+          image: image as ImageProvider,
           // image: NetworkImage("https://via.placeholder.com/400x300/f6f6f6"),
           fit: BoxFit.cover,
         ),

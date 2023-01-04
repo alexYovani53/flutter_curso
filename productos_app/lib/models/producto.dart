@@ -1,3 +1,6 @@
+
+import 'dart:convert';
+
 class Producto {
 	bool available;
 	String name;
@@ -25,16 +28,19 @@ class Producto {
 				price: json['price'] as double,
 			);
 
-	Map<String, dynamic> toFromService() => {
-				'available': available,
-				'name': name,
-				'picture': picture,
-				'price': price,
+	Map<String, dynamic> toMap() => {
+				"available": available,
+				"name": name,
+				"picture": picture,
+				"price": price,
 			};
+
+  String toJson() => json.encode(toMap());
 
   Producto copy() => Producto(
         available: available,
         name: name,
+        picture: picture,
         price: price,
         id: id,
       );

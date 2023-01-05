@@ -9,10 +9,11 @@ class AppRouter{
       case HomePage.routeName:
         return MaterialPageRoute(builder: (context) => const HomePage());
       case MessagePage.routeName:
-        return MaterialPageRoute(builder: (context) => const MessagePage());
+        return MaterialPageRoute(builder: (context) => const MessagePage(), settings: settings);
       default:
         return MaterialPageRoute(builder: (context) => const HomePage());
     }
   }
 
 }
+

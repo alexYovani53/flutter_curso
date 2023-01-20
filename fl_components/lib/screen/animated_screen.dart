@@ -34,7 +34,7 @@ class _AnimatedScreenState extends State<AnimatedScreen> {
       ),
       body: Center(
           child: AnimatedContainer(
-        duration: Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.bounceIn,
         width: _with,
         height: _height,
@@ -44,8 +44,8 @@ class _AnimatedScreenState extends State<AnimatedScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.play_circle_outline, size: 35),
         onPressed: changeShape,
+        child: const Icon(Icons.play_circle_outline, size: 35),
       ),
     );
   }

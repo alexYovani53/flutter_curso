@@ -5,7 +5,7 @@ import 'package:band_names/pages/home_page.dart';
 
 class AppRouter {
 
-  static String initialrotuer = StatusPage.routeName;
+  static String initialrotuer = HomePage.routeName;
   
   static Route<dynamic> onGenerateRoute(RouteSettings settings){
     switch (settings.name) {

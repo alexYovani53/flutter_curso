@@ -14,10 +14,16 @@ class StatusPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('ServerStatus: ${socketService.serverStatus.toString()}')
+            Text('ServerStatus: ${socketService.serverStatus}')
           ],
         ),
-      )
+      ), 
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          socketService.lanzarMensaje();
+        },
+        child: const Icon(Icons.send),
+      ),
     );
   }
 }

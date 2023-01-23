@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 enum ServerStatus {
   Online, 
@@ -15,25 +15,49 @@ class SocketService with ChangeNotifier {
     _initConfig();
   }
 
+  IO.Socket? socket;
+
   void _initConfig(){
      // Dart client
      // Ip del computador donde esta ejecutando el servidor y emulado el app. 
-    Socket socket = io('http://172.18.240.1:3000/',    
-    OptionBuilder()
-      .setTransports(['websocket']) // for Flutter or Dart VM
+
+    socket = IO.io('http://127.0.0.1:3000/',
+      IO.OptionBuilder()
+      .setTimeout(3000)
+      .setReconnectionDelay(5000)
+      .setTransports(['websocket']) 
+      .setExtraHeaders({'foo': 'bar'}) // optional
       .build()
     );
-    socket.onError((data) => print(data));
-    socket.onConnect((_) {
-      print('connect');
+
+    socket!.onConnect((_) {
       _serverStatuss = ServerStatus.Online;
       notifyListeners();
     });
-    socket.onDisconnect((_) {
-      print('connect');
+
+    socket!.onConnectError((er) {
+      print('ConnectError $er');
       _serverStatuss = ServerStatus.Offline;
       notifyListeners();
     });
+
+    socket!.onDisconnect((_) {
+      print('disconnect');
+      _serverStatuss = ServerStatus.Offline;
+      notifyListeners();
+    });
+    socket!.onError((data) => print(data));
+  }
+
+  void lanzarMensaje(){
+    socket!.emit("mensaje",{"Que tal"});
+  }
+
+  @override
+  void dispose() {
+    socket!.disconnect();
+    socket!.dispose();
+    super.dispose();
   }
 
 }

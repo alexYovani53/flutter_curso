@@ -32,6 +32,11 @@ io.on('connection', client => {
         io.emit('active-bands', bands.getBands());
     })
 
+    client.on('add-band', (payload )=>{
+        bands.addBand(new Band(payload.name));
+        io.emit('active-bands', bands.getBands());
+    })
+
     // client.on('emitir-mensaje', (payload)=>{
     //     console.log(payload);
     //     io.emit('nuevo-mensaje', payload);  // emite a todos

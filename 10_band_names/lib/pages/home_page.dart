@@ -30,10 +30,12 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     final socketService = Provider.of<SocketService>(context,listen: false);
-    socketService.socket!.on('active-bands', (payload) {
-      bands = (payload as List).map((band) => Band.fromMap(band)).toList();
-      setState(() {});
-    });
+    socketService.socket!.on('active-bands', _handleActiveBands);
+  }
+
+  _handleActiveBands(dynamic payload){
+    bands = (payload as List).map((band) => Band.fromMap(band)).toList();
+    setState(() {});
   }
 
 
@@ -89,11 +91,9 @@ class _HomePageState extends State<HomePage> {
         child: const Align(
           alignment: Alignment.centerLeft,
           child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
-        ),
+        )
       ),
-      onDismissed: (_) {
-        socketService.socket!.emit('delete-band', {'id': band.id});
-      },
+      onDismissed: (_) => socketService.socket!.emit('delete-band', {'id': band.id}),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.blue[100],
@@ -101,10 +101,8 @@ class _HomePageState extends State<HomePage> {
         ), 
         title: Text(band.name),
         trailing: Text('${band.votes}', style: const TextStyle(fontSize: 20)),
-        onTap: () {
-          socketService.socket!.emit('vote-band', {'id': band.id});
-        },
-      ),
+        onTap: () => socketService.socket!.emit('vote-band', {'id': band.id}),
+      )
     );
   }
 
@@ -113,7 +111,7 @@ class _HomePageState extends State<HomePage> {
     if (Platform.isAndroid) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (_) => AlertDialog(
           title: const Text('Nombre de Banda nueva: '),
           content: TextField(
             controller: textController,
@@ -124,8 +122,8 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Guardar'),
               onPressed: () => addBandToList(textController.text),
             )
-          ],
-        ), 
+          ]
+        )
       );
     } else {
       showCupertinoDialog(
@@ -141,8 +139,8 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Guardar'),
               onPressed: () => addBandToList(textController.text),
             )
-          ],
-        ), 
+          ]
+        )
       );
     }
   }
@@ -152,8 +150,6 @@ class _HomePageState extends State<HomePage> {
       final provider = Provider.of<SocketService>(context,listen: false);
       provider.socket!.emit('add-band', { 'name': newBand});
     }
-
     Navigator.pop(context);
   }
-  
 }

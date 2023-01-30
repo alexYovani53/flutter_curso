@@ -147,10 +147,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void addBandToList(String name){
-    if(name.isNotEmpty) {
-      bands.add(Band(id: "", name: name, votes: 5));
-      setState(() {});
+  void addBandToList(String newBand){
+    if(newBand.isNotEmpty) {
+      final provider = Provider.of<SocketService>(context,listen: false);
+      provider.socket!.emit('add-band', { 'name': newBand});
     }
 
     Navigator.pop(context);

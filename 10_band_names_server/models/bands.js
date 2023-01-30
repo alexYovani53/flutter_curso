@@ -1,4 +1,4 @@
-import Band from "./band";
+const Band = require('./band')
 
 class Bands {
     constructor(){

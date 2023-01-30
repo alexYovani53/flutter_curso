@@ -91,8 +91,8 @@ class _HomePageState extends State<HomePage> {
           child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
         ),
       ),
-      onDismissed: (direction) {
-        
+      onDismissed: (_) {
+        socketService.socket!.emit('delete-band', {'id': band.id});
       },
       child: ListTile(
         leading: CircleAvatar(

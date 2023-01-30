@@ -5,9 +5,8 @@ import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:chat/widgets/custom_input.dart';
 
-
-
 class LoginPage extends StatelessWidget {
+  static const String route = "login";
 
   @override
   Widget build(BuildContext context) {
@@ -21,72 +20,63 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-
-                Logo( titulo: 'Messenger' ),
-
+                Logo(titulo: 'Messenger'),
                 _Form(),
-
-                Labels( 
+                Labels(
                   ruta: 'register',
                   titulo: '¿No tienes cuenta?',
                   subTitulo: 'Crea una ahora!',
                 ),
-
-                Text('Términos y condiciones de uso', style: TextStyle( fontWeight: FontWeight.w200 ),)
-
+                Text(
+                  'Términos y condiciones de uso',
+                  style: TextStyle(fontWeight: FontWeight.w200),
+                )
               ],
             ),
           ),
         ),
-      )
-   );
+      ),
+    );
   }
 }
 
-
-
 class _Form extends StatefulWidget {
   @override
-  __FormState createState() => __FormState();
+  _FormState createState() => _FormState();
 }
 
-class __FormState extends State<_Form> {
-
+class _FormState extends State<_Form> {
   final emailCtrl = TextEditingController();
-  final passCtrl  = TextEditingController();
+  final passCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 40),
-      padding: EdgeInsets.symmetric( horizontal: 50 ),
-       child: Column(
-         children: <Widget>[
-           
-           CustomInput(
-             icon: Icons.mail_outline,
-             placeholder: 'Correo',
-             keyboardType: TextInputType.emailAddress, 
-             textController: emailCtrl,
-           ),
-
-           CustomInput(
-             icon: Icons.lock_outline,
-             placeholder: 'Contraseña',
-             textController: passCtrl,
-             isPassword: true,
-           ),
-           
-
-           BotonAzul(
-             text: 'Ingrese',
-             onPressed: () {
-               print( emailCtrl.text );
-               print( passCtrl.text );
-             }
-           )
-         ]
-       )
+      padding: EdgeInsets.symmetric(horizontal: 50),
+      child: Column(
+        children: <Widget>[
+          CustomInput(
+            icon: Icons.mail_outline,
+            placeholder: 'Correo',
+            keyboardType: TextInputType.emailAddress,
+            textController: emailCtrl,
+          ),
+          CustomInput(
+            icon: Icons.lock_outline,
+            placeholder: 'Contraseña',
+            textController: passCtrl,
+            isPassword: true,
+          ),
+          BotonAzul(
+            text: 'Ingrese',
+            onPressed: () {
+              print(emailCtrl.text);
+              print(passCtrl.text);
+            },
+          )
+        ],
+      ),
     );
   }
 }

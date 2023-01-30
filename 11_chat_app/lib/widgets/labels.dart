@@ -21,7 +21,8 @@ class Labels extends StatelessWidget {
           SizedBox(height: 10),
           GestureDetector(
             child: Text(this.subTitulo,
-                style: TextStyle(color: Colors.blue[600], fontSize: 18, fontWeight: FontWeight.bold)),
+              style: TextStyle(color: Colors.blue[600], fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             onTap: () {
               Navigator.pushReplacementNamed(context, this.ruta);
             },

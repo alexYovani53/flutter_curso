@@ -1,3 +1,5 @@
+import Band from "./band";
+
 class Bands {
     constructor(){
         this.bands = [];
@@ -20,7 +22,7 @@ class Bands {
         this.bands = this.bands.map(band => {
             if(band.id === id){
               band.votes++;
-              return band;
+              this.band;
             } 
             return band;
         })

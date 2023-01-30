@@ -1,0 +1,31 @@
+import 'dart:convert';
+
+class Band {
+  String id;
+  String name;
+  int votes;
+
+  Band({
+    required this.id,
+    required this.name,
+    required this.votes,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'votes': votes,
+    };
+  }
+
+  factory Band.fromMap(Map<String, dynamic> map) => Band(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      votes: map['votes']?.toInt() ?? 0,
+    );
+
+  String toJson() => json.encode(toMap());
+
+  factory Band.fromJson(String source) => Band.fromMap(json.decode(source));
+}

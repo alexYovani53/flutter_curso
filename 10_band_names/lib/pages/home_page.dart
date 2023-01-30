@@ -18,12 +18,32 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   
   List<Band> bands = [
-    Band(id: "1", name: "Metallica", votes: 5),
-    Band(id: "2", name: "Metallica", votes: 3),
-    Band(id: "3", name: "Metallica", votes: 5),
-    Band(id: "4", name: "Metallica", votes: 1),
-    Band(id: "5", name: "Metallica", votes: 6),
+    // Band(id: "1", name: "Metallica", votes: 5),
+    // Band(id: "2", name: "Metallica", votes: 3),
+    // Band(id: "3", name: "Metallica", votes: 5),
+    // Band(id: "4", name: "Metallica", votes: 1),
+    // Band(id: "5", name: "Metallica", votes: 6),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    final socketService = Provider.of<SocketService>(context,listen: false);
+    socketService.socket!.on('active-bands', (payload) {
+      bands = (payload as List).map((band) => Band.fromMap(band)).toList();
+    });
+  }
+
+
+  @override
+  void dispose() {
+
+    final socketService = Provider.of<SocketService>(context,listen: false);
+    socketService.socket!.off('active-bands');
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +83,10 @@ class _HomePageState extends State<HomePage> {
     background: Container(
       padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
       color: Colors.blue[100],
-          child: const Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
-          ),
+      child: const Align(
+        alignment: Alignment.centerLeft,
+        child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
+      ),
     ),
     onDismissed: (direction) {
       

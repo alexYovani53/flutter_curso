@@ -21,7 +21,7 @@ class SocketService with ChangeNotifier {
      // Dart client
      // Ip del computador donde esta ejecutando el servidor y emulado el app. 
 
-    socket = IO.io('http://127.0.0.1:3000/',
+    socket = IO.io('http://192.168.1.160:3000/',
       IO.OptionBuilder()
       .setTimeout(3000)
       .setReconnectionDelay(5000)

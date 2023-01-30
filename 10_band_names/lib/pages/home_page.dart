@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
     final socketService = Provider.of<SocketService>(context,listen: false);
     socketService.socket!.on('active-bands', (payload) {
       bands = (payload as List).map((band) => Band.fromMap(band)).toList();
+      setState(() {});
     });
   }
 
@@ -77,21 +78,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _bandTile(Band band) => Dismissible(
-    key: Key(band.id),
-    direction: DismissDirection.startToEnd,
-    background: Container(
-      padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-      color: Colors.blue[100],
-      child: const Align(
-        alignment: Alignment.centerLeft,
-        child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
+  Widget _bandTile(Band band) {
+    final socketService = Provider.of<SocketService>(context, listen: false);
+    return Dismissible(
+      key: Key(band.id),
+      direction: DismissDirection.startToEnd,
+      background: Container(
+        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+        color: Colors.blue[100],
+        child: const Align(
+          alignment: Alignment.centerLeft,
+          child: Text('Eliminar banda', style: TextStyle(color: Colors.white),),
+        ),
       ),
-    ),
-    onDismissed: (direction) {
-      
-    },
-    child: ListTile(
+      onDismissed: (direction) {
+        
+      },
+      child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.blue[100],
           child: Text(band.name.substring(0,2)),
@@ -99,10 +102,11 @@ class _HomePageState extends State<HomePage> {
         title: Text(band.name),
         trailing: Text('${band.votes}', style: const TextStyle(fontSize: 20)),
         onTap: () {
-          
+          socketService.socket!.emit('vote-band', {'id': band.id});
         },
       ),
-  );
+    );
+  }
 
   addNewBand(){
     final textController = TextEditingController();

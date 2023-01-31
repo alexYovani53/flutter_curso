@@ -11,51 +11,59 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
-  List<ChatMessage> messages = [
-    ChatMessage(message: "Hola mundo", uid: "123"),
-    ChatMessage(message: "Hola mundo", uid: "123d"),
-    ChatMessage(message: "Hola mundo dfsdf sdfa sdf", uid: "123"),
-    ChatMessage(message: "Hola mundo dfsdf sdfa sdf  fdasfasd asdf as asdf ", uid: "123"),
-    ChatMessage(message: "Hola mundo  afasdfa sdfasdfasdf adf adsf ", uid: "123d"),
-    ChatMessage(message: "Hola mundo", uid: "123"),
-    ChatMessage(message: "Hola mundo", uid: "123d"),
-    ChatMessage(message: "Hola mundo", uid: "123"),
-  ];
+class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
+  List<ChatMessage> messages = [];
+  @override
+  void initState() {
+    super.initState();
+    messages = [];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _CustomAppBar(),
-      body: Container(
-        child: Column(
-          children: [
-            Flexible(
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                reverse: true,
-                itemCount: messages.length,
-                itemBuilder: (context, index) => messages[index]
+        appBar: _CustomAppBar(),
+        body: Container(
+          child: Column(
+            children: [
+              Flexible(
+                child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    reverse: true,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) => messages[index]),
               ),
-            ), 
-
-            _InputChat(sendMessage: setMesage),
-          ],
-        ),
-      )
-    );
+              _InputChat(sendMessage: setMesage),
+            ],
+          ),
+        ));
   }
 
-  setMesage(ChatMessage message){
-    this.messages.insert(0,message);
+  setMesage(String message) {
+    final msg = ChatMessage(
+        message: message,
+        uid: "123",
+        controller: AnimationController(vsync: this, duration: Duration(milliseconds: 800)));
+    this.messages.insert(0, msg);
+    msg.controller.forward();
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    for (var message in messages) {
+      message.controller.dispose();
+    }
+
+    super.dispose();
   }
 }
 
 class _InputChat extends StatefulWidget {
-  final Function(ChatMessage) sendMessage;
+  final Function(String) sendMessage;
   _InputChat({
-    Key? key, required this.sendMessage,
+    Key? key,
+    required this.sendMessage,
   }) : super(key: key);
 
   @override
@@ -81,16 +89,13 @@ class _InputChatState extends State<_InputChat> {
                 height: 50,
                 margin: EdgeInsets.all(10),
                 padding: EdgeInsets.only(left: 25, right: 25),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(40)
-                ),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(40)),
                 child: TextFormField(
                   enableSuggestions: true,
                   controller: _textController,
-                  onFieldSubmitted: _handleSubmit,
+                  onFieldSubmitted: _estaEscribiendo ? _handleSubmit : null,
                   onChanged: (value) {
-                   setState(() {
+                    setState(() {
                       if (this._textController.text.trim().length > 0) {
                         _estaEscribiendo = true;
                       } else {
@@ -98,54 +103,43 @@ class _InputChatState extends State<_InputChat> {
                       }
                     });
                   },
-                  decoration: InputDecoration.collapsed(
-                    hintText: 'Enviar mensaje', 
-                    fillColor: Colors.white
-                  ),
+                  decoration: InputDecoration.collapsed(hintText: 'Enviar mensaje', fillColor: Colors.white),
                   focusNode: _focusNode,
                 ),
               ),
             ),
 
             //Boton de enviar
-            if(_estaEscribiendo) Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Platform.isIOS 
-                ? CupertinoButton(
-                    child: Text('Enviar'),
-                    onPressed: _estaEscribiendo 
-                        ? () => _handleSubmit(_textController.text)
-                        : null
-                  )
-                : Container(
+            if (_estaEscribiendo)
+              Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: IconTheme(
-                    data: IconThemeData(color: Colors.blue[300]),
-                    child: IconButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      icon: Icon(Icons.send),
-                      onPressed: _estaEscribiendo 
-                        ? () => _handleSubmit(_textController.text)
-                        : null
-                    ),
-                  ),
-                )
-            )
-
+                  child: Platform.isIOS
+                      ? CupertinoButton(
+                          child: Text('Enviar'),
+                          onPressed: _estaEscribiendo ? () => _handleSubmit(_textController.text) : null)
+                      : Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: IconTheme(
+                            data: IconThemeData(color: Colors.blue[300]),
+                            child: IconButton(
+                                highlightColor: Colors.transparent,
+                                splashColor: Colors.transparent,
+                                icon: Icon(Icons.send),
+                                onPressed: _estaEscribiendo ? () => _handleSubmit(_textController.text) : null),
+                          ),
+                        ))
           ],
         ),
       ),
     );
   }
 
-  _handleSubmit(String text){
+  _handleSubmit(String text) {
     debugPrint(text);
     _textController.clear();
     _focusNode.requestFocus();
 
-    final newMessage = ChatMessage(message: text, uid: "123");
-    widget.sendMessage(newMessage);
+    widget.sendMessage(text);
     setState(() {
       _estaEscribiendo = false;
     });
@@ -153,27 +147,24 @@ class _InputChatState extends State<_InputChat> {
 }
 
 class _CustomAppBar extends StatelessWidget with PreferredSizeWidget {
-  const _CustomAppBar() ;
+  const _CustomAppBar();
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      centerTitle: true,
-      backgroundColor: Colors.white,
-      title: Column(
-        children: [
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        title: Column(children: [
           CircleAvatar(
             child: Text("AY", style: TextStyle(fontSize: 12)),
             backgroundColor: Colors.blue[200],
             maxRadius: 14,
-          ), 
-          SizedBox(height: 3), 
+          ),
+          SizedBox(height: 3),
           Text('Yovani ', style: TextStyle(color: Colors.black87, fontSize: 10))
-        ]
-      )
-    );
+        ]));
   }
-  
+
   @override
   Size get preferredSize => Size(double.infinity, kToolbarHeight);
 }

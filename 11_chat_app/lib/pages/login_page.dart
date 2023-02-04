@@ -1,9 +1,14 @@
+import 'package:chat/pages/register_page.dart';
+import 'package:chat/pages/usuarios_page.dart';
+import 'package:chat/providers/auth_service.dart';
 import 'package:chat/widgets/boton_azul.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:chat/widgets/custom_input.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   static const String route = "login";
@@ -23,7 +28,7 @@ class LoginPage extends StatelessWidget {
                 Logo(titulo: 'Messenger'),
                 _Form(),
                 Labels(
-                  ruta: 'register',
+                  ruta: RegisterPage.route,
                   titulo: '¿No tienes cuenta?',
                   subTitulo: 'Crea una ahora!',
                 ),
@@ -51,6 +56,7 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AuthProvider>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -68,11 +74,22 @@ class _FormState extends State<_Form> {
             textController: passCtrl,
             isPassword: true,
           ),
-          BotonAzul(
+          provider.autenticando 
+            ? Center(child: CupertinoActivityIndicator())
+            : BotonAzul(
             text: 'Ingrese',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passCtrl.text);
+            onPressed: () async {
+              FocusScope.of(context).unfocus();
+              provider.autenticando = true;
+              final res = await provider.login(emailCtrl.text, passCtrl.text);
+              if (res.token != null) {
+                Navigator.pushNamed(context, UsuariosPage.route);
+              }else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(res.msg!))
+                );
+              }
+              provider.autenticando = false;
             },
           )
         ],

@@ -1,5 +1,9 @@
 import 'package:chat/models/usuario_model.dart';
+import 'package:chat/pages/login_page.dart';
+import 'package:chat/providers/auth_service.dart';
+import 'package:chat/utils/app_secure_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UsuariosPage extends StatefulWidget {
@@ -20,13 +24,19 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi nombre', style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+        title: Text(provider.usuario.nombre, style: TextStyle(color: Colors.black)),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            await logOut();
+            Navigator.pushReplacementNamed(context,LoginPage.route);
+          },
           icon: Icon(Icons.exit_to_app, color: Colors.black)
         ),
         actions: [

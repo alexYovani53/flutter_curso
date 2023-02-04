@@ -1,9 +1,12 @@
+import 'package:chat/pages/usuarios_page.dart';
+import 'package:chat/providers/auth_service.dart';
 import 'package:chat/widgets/boton_azul.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:chat/widgets/custom_input.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   static const String route = "registro";
@@ -51,6 +54,7 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AuthProvider>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -74,11 +78,23 @@ class __FormState extends State<_Form> {
             textController: passCtrl,
             isPassword: true,
           ),
-          BotonAzul(
+          
+          provider.autenticando 
+            ? Center(child: CircularProgressIndicator()) 
+            : BotonAzul(
             text: 'Ingrese',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passCtrl.text);
+            onPressed:  () async {
+              FocusScope.of(context).unfocus();
+              provider.autenticando = true;
+              final resp = await provider.singUp(nameCtrl.text, emailCtrl.text, passCtrl.text);
+              if (resp.token != null) {
+                Navigator.pushNamed(context, UsuariosPage.route);
+              }else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(resp.msg!))
+                );
+              }
+              provider.autenticando = false;
             },
           )
         ],

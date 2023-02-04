@@ -1,8 +1,12 @@
 import 'dart:io';
 
+import 'package:chat/pages/login_page.dart';
+import 'package:chat/providers/auth_service.dart';
+import 'package:chat/utils/app_secure_storage.dart';
 import 'package:chat/widgets/chat_message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   static const String route = "chat";
@@ -22,28 +26,32 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _CustomAppBar(),
-        body: Container(
-          child: Column(
-            children: [
-              Flexible(
-                child: ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    reverse: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) => messages[index]),
-              ),
-              _InputChat(sendMessage: setMesage),
-            ],
-          ),
-        ));
+      appBar: _CustomAppBar(),
+      body: Container(
+        child: Column(
+          children: [
+            Flexible(
+              child: ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) => messages[index]),
+            ),
+            _InputChat(sendMessage: setMesage),
+          ],
+        ),
+      )
+    );
   }
 
   setMesage(String message) {
     final msg = ChatMessage(
-        message: message,
-        uid: "123",
-        controller: AnimationController(vsync: this, duration: Duration(milliseconds: 800)));
+      message: message,
+      uid: "123",
+      controller: AnimationController(
+        vsync: this, duration: Duration(milliseconds: 800)
+      )
+    );
     this.messages.insert(0, msg);
     msg.controller.forward();
     setState(() {});
@@ -151,17 +159,20 @@ class _CustomAppBar extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AuthProvider>(context);
     return AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         title: Column(children: [
           CircleAvatar(
-            child: Text("AY", style: TextStyle(fontSize: 12)),
+            child: Text(provider.usuario.getIniciales(), style: TextStyle(fontSize: 12)),
             backgroundColor: Colors.blue[200],
             maxRadius: 14,
           ),
           SizedBox(height: 3),
-          Text('Yovani ', style: TextStyle(color: Colors.black87, fontSize: 10))
+          Text(
+            provider.usuario.email, style: TextStyle(color: Colors.black87, fontSize: 10
+          ))
         ]));
   }
 

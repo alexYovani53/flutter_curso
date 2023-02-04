@@ -1,6 +1,7 @@
 import 'package:chat/pages/login_page.dart';
 import 'package:chat/pages/usuarios_page.dart';
 import 'package:chat/providers/auth_service.dart';
+import 'package:chat/providers/socket_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,10 @@ class LoadingPage extends StatelessWidget {
     final state = await provider.hasTokenValidate();
 
     final page = state ? UsuariosPage() : LoginPage();
-    print(state);
+    if (state) {
+      final socket = Provider.of<SocketService>(context, listen: false);
+      socket.connect();
+    } 
     Navigator.pushReplacement(
       context, 
       PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => page)

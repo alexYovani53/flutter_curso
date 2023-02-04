@@ -1,15 +1,14 @@
 import 'dart:io';
 
-import 'package:chat/pages/login_page.dart';
 import 'package:chat/providers/auth_service.dart';
-import 'package:chat/utils/app_secure_storage.dart';
+import 'package:chat/providers/chat_service.dart';
+import 'package:chat/providers/socket_provider.dart';
 import 'package:chat/widgets/chat_message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
-  static const String route = "chat";
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -17,10 +16,46 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   List<ChatMessage> messages = [];
+  late ChatService chatprovider;
+  late SocketService socketService;
+  late AuthProvider authProvider;
+
   @override
   void initState() {
     super.initState();
-    messages = [];
+    chatprovider = Provider.of<ChatService>(context, listen: false);
+    socketService = Provider.of<SocketService>(context, listen: false);
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    _cargarHistorial();
+
+    socketService.socket!.on("mensaje-recibido", _escucharMensaje);
+
+  }
+
+  void _cargarHistorial() async {
+    final mensajes = await chatprovider.getMensajesChat();
+    final history = mensajes.map((e) =>ChatMessage(
+      message: e.mensaje,
+      uid: e.de,
+      controller: AnimationController(vsync: this, duration: Duration(milliseconds: 0))..forward()
+    ));
+
+    setState(() {
+      messages.insertAll(0, history);
+    });
+  }
+
+  _escucharMensaje(payload) {
+    final msg = ChatMessage(
+      message: payload['mensaje'],
+      uid: payload['de'],
+      controller: AnimationController(vsync: this, duration: Duration(milliseconds: 100))
+    );
+    
+    setState(() => this.messages.insert(0, msg));
+    
+    msg.controller.forward();
   }
 
   @override
@@ -32,29 +67,35 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           children: [
             Flexible(
               child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  reverse: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) => messages[index]),
+                physics: BouncingScrollPhysics(),
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) => messages[index]),
             ),
-            _InputChat(sendMessage: setMesage),
+            _InputChat(sendMessage: sendMessage),
           ],
         ),
       )
     );
   }
 
-  setMesage(String message) {
+  sendMessage(String message) {
     final msg = ChatMessage(
       message: message,
-      uid: "123",
+      uid: authProvider.usuario.uid,
       controller: AnimationController(
-        vsync: this, duration: Duration(milliseconds: 800)
+        vsync: this, duration: Duration(milliseconds: 100)
       )
     );
     this.messages.insert(0, msg);
     msg.controller.forward();
     setState(() {});
+
+    this.socketService.socket!.emit("mensaje-personal", {
+      'de': authProvider.usuario.uid, 
+      'para': chatprovider.user.uid, 
+      'mensaje': message
+    });
   }
 
   @override
@@ -63,6 +104,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       message.controller.dispose();
     }
 
+    this.socketService.socket!.off('mensaje-recibido');
     super.dispose();
   }
 }
@@ -159,19 +201,19 @@ class _CustomAppBar extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AuthProvider>(context);
+    final chatService = Provider.of<ChatService>(context);
     return AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         title: Column(children: [
           CircleAvatar(
-            child: Text(provider.usuario.getIniciales(), style: TextStyle(fontSize: 12)),
+            child: Text(chatService.user.getIniciales(), style: TextStyle(fontSize: 12)),
             backgroundColor: Colors.blue[200],
             maxRadius: 14,
           ),
           SizedBox(height: 3),
           Text(
-            provider.usuario.email, style: TextStyle(color: Colors.black87, fontSize: 10
+            chatService.user.email, style: TextStyle(color: Colors.black87, fontSize: 10
           ))
         ]));
   }

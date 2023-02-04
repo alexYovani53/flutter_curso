@@ -1,10 +1,14 @@
-import 'package:chat/models/usuario_model.dart';
-import 'package:chat/pages/login_page.dart';
-import 'package:chat/providers/auth_service.dart';
-import 'package:chat/utils/app_secure_storage.dart';
+import 'package:chat/pages/chat_page/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import 'package:chat/models/usuario_model.dart';
+import 'package:chat/pages/login_page.dart';
+import 'package:chat/providers/auth_service.dart';
+import 'package:chat/providers/socket_provider.dart';
+import 'package:chat/providers/usuarios_service.dart';
+import 'package:chat/utils/app_secure_storage.dart';
 
 class UsuariosPage extends StatefulWidget {
   static const String route = "usuarios";
@@ -15,17 +19,20 @@ class UsuariosPage extends StatefulWidget {
 
 class _UsuariosPageState extends State<UsuariosPage> {
   
-  final usuarios = [
-    Usuario(online: true, email: "alex@gmail.com", nombre: "Alex", uid: "13fd"),
-    Usuario(online: true, email: "alex2@gmail.com", nombre: "Alex2", uid: "13fd"),
-  ];
+  List<Usuario> usuarios = <Usuario>[];
   
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   @override
+  void initState() {
+    _pedirUsuarios();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AuthProvider>(context);
-
+    final socket  = Provider.of<SocketService>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -35,6 +42,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
         leading: IconButton(
           onPressed: () async {
             await logOut();
+            socket.disconnect();
             Navigator.pushReplacementNamed(context,LoginPage.route);
           },
           icon: Icon(Icons.exit_to_app, color: Colors.black)
@@ -42,8 +50,9 @@ class _UsuariosPageState extends State<UsuariosPage> {
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),
-            // child: Icon(Icons.check_circle, color: Colors.blue[300]),
-            child: Icon(Icons.offline_bolt, color: Colors.red[300]),
+            child: socket.serverStatus == ServerStatus.Online 
+              ? Icon(Icons.check_circle, color: Colors.blue[300])
+              : Icon(Icons.offline_bolt, color: Colors.red[300]),
           )
         ],
       ),
@@ -55,26 +64,45 @@ class _UsuariosPageState extends State<UsuariosPage> {
           waterDropColor: Colors.blue[400]!,
         ),
         controller: _refreshController,
-        child: _listViewUsuarios(),
+        child: UsuariosList(usuarios: usuarios),
         onRefresh: _cargarUsuarios,
       )
     );
   }
 
-  ListView _listViewUsuarios() {
-    return ListView.separated(
+
+
+  void _cargarUsuarios() async {
+    _pedirUsuarios();    
+    setState(() {});
+    _refreshController.refreshCompleted();
+  }
+
+  void _pedirUsuarios() async{
+    final result = await UsuariosService().getUsuarios();
+    this.usuarios = result;
+  }
+}
+
+
+class UsuariosList extends StatelessWidget {
+  final List<Usuario> usuarios;
+  const UsuariosList({
+    Key? key,
+    required this.usuarios,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return  ListView.separated(
       physics: BouncingScrollPhysics(),
       itemCount: usuarios.length,
       itemBuilder: (context, index) =>  _UsuarioListTitle(usuario: usuarios[index]),
       separatorBuilder: (context, index) => Divider(),
     );
   }
-
-  void _cargarUsuarios() async {
-    await Future.delayed(Duration(seconds: 4));
-    _refreshController.refreshCompleted();
-  }
 }
+
 
 class _UsuarioListTitle extends StatelessWidget {
   const _UsuarioListTitle({
@@ -101,6 +129,9 @@ class _UsuarioListTitle extends StatelessWidget {
           borderRadius: BorderRadius.circular(100)
         ),
       ),
+      onTap: () {
+        Navigator.pushNamed(context, ChatPageInit.routeName, arguments: this.usuario);
+      },
     );
   }
 }

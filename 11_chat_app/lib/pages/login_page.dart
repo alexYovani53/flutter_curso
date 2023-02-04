@@ -1,6 +1,7 @@
 import 'package:chat/pages/register_page.dart';
 import 'package:chat/pages/usuarios_page.dart';
 import 'package:chat/providers/auth_service.dart';
+import 'package:chat/providers/socket_provider.dart';
 import 'package:chat/widgets/boton_azul.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +58,7 @@ class _FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AuthProvider>(context);
+    final socket   = Provider.of<SocketService>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -83,6 +85,7 @@ class _FormState extends State<_Form> {
               provider.autenticando = true;
               final res = await provider.login(emailCtrl.text, passCtrl.text);
               if (res.token != null) {
+                socket.connect();
                 Navigator.pushNamed(context, UsuariosPage.route);
               }else{
                 ScaffoldMessenger.of(context).showSnackBar(

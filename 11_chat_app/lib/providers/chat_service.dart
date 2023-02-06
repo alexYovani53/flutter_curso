@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chat/models/mensaje.dart';
 import 'package:chat/models/mensajes_response.dart';
 import 'package:chat/utils/app_config.dart';
@@ -22,7 +24,10 @@ class ChatService with ChangeNotifier {
 
 
     final uri = Uri.http(Configs.apiUrl, "${Configs.mensajesPath}/${user.uid}" );
-    final resp = await http.get(uri, headers: headers);
+    final resp = await http.get(uri, headers: headers)
+      .timeout(const Duration(seconds: 3), onTimeout: () {
+        return http.Response( json.encode({"ok":false, "msg":'Time out, servidor fuera de linea'}), 408);
+      });
 
     print(uri.path);
 

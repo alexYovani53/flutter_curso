@@ -29,7 +29,10 @@ class AuthProvider with ChangeNotifier{
     };
 
     final uri = Uri.http(Configs.apiUrl, Configs.loginPath);
-    final resp = await http.post(uri, body: jsonEncode(data), headers: {'Content-Type':'application/json'});
+    final resp = await http.post(uri, body: jsonEncode(data), headers: {'Content-Type':'application/json'})
+      .timeout(const Duration(seconds: 3), onTimeout: () {
+        return http.Response( json.encode({"ok":false, "msg":'Time out, servidor fuera de linea'}), 408);
+      });
     final loginData = LoginResponse.fromJson(resp.body);
 
     if (resp.statusCode == 200) {
@@ -48,7 +51,10 @@ class AuthProvider with ChangeNotifier{
     };
 
     final uri = Uri.http(Configs.apiUrl, Configs.registerPath);
-    final resp = await http.post(uri, body: jsonEncode(data), headers: {'Content-Type':'application/json'});
+    final resp = await http.post(uri, body: jsonEncode(data), headers: {'Content-Type':'application/json'})
+      .timeout(const Duration(seconds: 3), onTimeout: () {
+        return http.Response( json.encode({"ok":false, "msg":'Time out, servidor fuera de linea'}), 408);
+      });
     
     print(resp);
     final loginData = LoginResponse.fromJson(resp.body);
@@ -69,7 +75,10 @@ class AuthProvider with ChangeNotifier{
     }
 
     final uri = Uri.http(Configs.apiUrl, Configs.renewPath);
-    final resp = await http.get(uri, headers: {'Content-Type':'application/json', 'Authorization': token});
+    final resp = await http.get(uri, headers: {'Content-Type':'application/json', 'Authorization': token})
+      .timeout(const Duration(seconds: 3), onTimeout: () {
+        return http.Response( json.encode({"ok":false, "msg":'Time out, servidor fuera de linea'}), 408);
+      });
     
     final loginData = LoginResponse.fromJson(resp.body);
 
